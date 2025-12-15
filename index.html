@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distraction Free Writer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #0f1115;
+      --bg-2: #111827;
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #3dd5f3;
+      --accent-2: #6dd3b1;
+      --text: #e7edf5;
+      --muted: #9fb2c8;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(120% 120% at 20% 20%, rgba(61, 213, 243, 0.08), transparent 50%),
+                  radial-gradient(120% 120% at 80% 10%, rgba(109, 211, 177, 0.08), transparent 50%),
+                  linear-gradient(145deg, var(--bg-1), var(--bg-2));
+      color: var(--text);
+      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+
+    .grid-overlay::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+      mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.4), transparent 65%);
+    }
+
+    .shell {
+      position: relative;
+      width: min(1200px, 92vw);
+      height: min(750px, 88vh);
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      backdrop-filter: blur(12px) saturate(120%);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 18px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+      border-bottom: 1px solid var(--border);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: linear-gradient(145deg, rgba(61, 213, 243, 0.12), rgba(61, 213, 243, 0.04));
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      opacity: 0.9;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(61, 213, 243, 0.5);
+      box-shadow: 0 10px 30px rgba(61, 213, 243, 0.14);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .editor {
+      flex: 1;
+      padding: 28px;
+      overflow-y: auto;
+      font-family: 'IBM Plex Mono', 'Space Grotesk', system-ui, -apple-system, monospace;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      outline: none;
+      border: none;
+      background: transparent;
+      caret-color: var(--accent);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+      resize: none;
+      width: 100%;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .editor::placeholder {
+      color: var(--muted);
+      opacity: 0.8;
+    }
+
+    .editor::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    .editor::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+    }
+
+    .editor:focus-visible {
+      outline: 1px solid rgba(61, 213, 243, 0.25);
+      outline-offset: 8px;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .shell { height: min(700px, 92vh); border-radius: 18px; }
+      .toolbar { padding: 12px 14px; }
+      .btn { padding: 9px 12px; }
+      .editor { padding: 20px; font-size: 1rem; }
+    }
+  </style>
+</head>
+<body class="grid-overlay">
+  <div class="shell">
+    <div class="toolbar">
+      <button class="btn" id="copyBtn" type="button" aria-label="Copy all text">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+        Copy
+      </button>
+      <button class="btn" id="loadBtn" type="button" aria-label="Open text file">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12" />
+          <path d="m7 11 5 5 5-5" />
+          <path d="M4 20h16" />
+        </svg>
+        Open
+      </button>
+      <button class="btn" id="saveBtn" type="button" aria-label="Save text file">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 4h10l4 4v12H5z" />
+          <path d="M9 4v6h6" />
+        </svg>
+        Save
+      </button>
+      <input id="fileInput" type="file" accept="text/plain,.txt,.md" hidden />
+    </div>
+    <textarea
+      id="editor"
+      class="editor"
+      spellcheck="false"
+      aria-label="Distraction free editor"
+      placeholder="Start typing here..."
+    ></textarea>
+  </div>
+
+  <script>
+    const editor = document.getElementById('editor');
+    const loadBtn = document.getElementById('loadBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const fileInput = document.getElementById('fileInput');
+
+    // Trigger native file picker for loading content
+    loadBtn.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (event) => {
+      const [file] = event.target.files || [];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        editor.value = e.target?.result || '';
+      };
+      reader.readAsText(file);
+      fileInput.value = '';
+    });
+
+    // Save current text content as a plain .txt file
+    saveBtn.addEventListener('click', () => {
+      const blob = new Blob([editor.value], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'notes.txt';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // Copy all text to clipboard
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(editor.value);
+        copyBtn.querySelector('svg').style.stroke = 'var(--accent-2)';
+        setTimeout(() => {
+          copyBtn.querySelector('svg').style.stroke = '';
+        }, 600);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    });
+  </script>
+</body>
+</html>
