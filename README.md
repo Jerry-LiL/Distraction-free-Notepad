@@ -1,10 +1,20 @@
-# Distraction Free Writer
-A minimal dark-mode notepad for the browser
-Open index.html in any modern browser
-All logic is client-side; no data leaves your machine
+## 📝 Bullet Point System
 
-📝 Bullet Point System
-A distraction-free, hierarchical list system — all powered by the backtick key.
-ActionHowStart a listLong-press ` (~350ms)Next bulletShort-press ` on a bulleted lineNest deeperLong-press ` on an existing bullet (up to 5 levels)Go back / ExitPress Esc to un-indent; press Esc at the top level to exit the list entirely
+A distraction-free, hierarchical list system — all powered by the backtick (`) key.
 
-Tapping ` outside a list always types a normal backtick — no delay, no surprises.
+---
+
+### How It Works
+
+- **Start a list** — Long-press `` ` `` (~350ms) to create your first bullet point
+- **Next bullet** — Short-press `` ` `` on a bulleted line to add the next bullet below
+- **Nest deeper** — Long-press `` ` `` on an existing bullet to indent into a sub-bullet
+- **Go back one level** — Press `Esc` to un-indent by one level
+- **Exit the list** — Press `Esc` at the top-level bullet to return to normal typing
+
+---
+
+### Notes
+
+- Supports up to **5 levels** of nesting
+- Tapping `` ` `` outside of a list always types a **normal backtick** — no delay, no surprises
