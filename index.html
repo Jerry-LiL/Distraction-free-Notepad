@@ -294,6 +294,16 @@
         </svg>
         Save
       </button>
+      <button class="btn" id="clearBtn" type="button" aria-label="Clear all text">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18" />
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+          <line x1="10" x2="10" y1="11" y2="17" />
+          <line x1="14" x2="14" y1="11" y2="17" />
+        </svg>
+        Clear
+      </button>
       <div class="divider"></div>
       <button class="btn btn-icon" id="closeBtn" type="button" aria-label="Close tab">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -323,10 +333,22 @@
     </div>
   </div>
 
+  <div id="clearModal" class="modal-overlay">
+    <div class="modal">
+      <h3>Clear Notepad</h3>
+      <p>Are you sure you want to clear all text? This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn" id="modalClearCancel">Cancel</button>
+        <button class="btn btn-danger" id="modalClearConfirm">Clear</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const editor = document.getElementById('editor');
     const loadBtn = document.getElementById('loadBtn');
     const saveBtn = document.getElementById('saveBtn');
+    const clearBtn = document.getElementById('clearBtn');
     const copyBtn = document.getElementById('copyBtn');
     const closeBtn = document.getElementById('closeBtn');
     const fileInput = document.getElementById('fileInput');
@@ -542,11 +564,38 @@
       }
     });
 
+    // Clear text handler
+    clearBtn.addEventListener('click', () => {
+      if (editor.value.length === 0) return;
+      document.getElementById('clearModal').classList.add('active');
+    });
+
+    document.getElementById('modalClearCancel').addEventListener('click', () => {
+      document.getElementById('clearModal').classList.remove('active');
+    });
+
+    document.getElementById('modalClearConfirm').addEventListener('click', () => {
+      editor.value = '';
+      setDirty();
+      document.getElementById('clearModal').classList.remove('active');
+      editor.focus();
+    });
+
     // Close tab handler
     function closeTab() {
+      // Workaround to bypass browser security restrictions for closing tabs
+      window.open('about:blank', '_self').close();
       window.close();
-      // Fallback display if closing the window fails
-      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:sans-serif;font-size:1.2rem;">Tab closed. You may exit this page.</div>';
+      
+      // Fallback display if closing the window fails due to strict browser security
+      setTimeout(() => {
+        document.body.innerHTML = `
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#000;color:#fff;font-family:sans-serif;gap:16px;">
+            <div style="font-size:1.2rem;">Browser security prevents automatic closing.</div>
+            <div style="color:#888;font-size:0.95rem;">Please press <strong style="color:#fff;">Ctrl + W</strong> or <strong style="color:#fff;">Cmd + W</strong> to close this tab.</div>
+          </div>
+        `;
+      }, 200);
     }
 
     closeBtn.addEventListener('click', () => {
